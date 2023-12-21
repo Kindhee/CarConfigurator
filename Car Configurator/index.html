@@ -1,0 +1,296 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width,initial-scale=1.0" name="viewport" />
+    <title>3dverse Car Configurator</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+
+  <body>
+    <div class="canvas-container">
+      <!-- CANVAS -->
+      <canvas
+        id="display-canvas"
+        class="display-canvas"
+        oncontextmenu="event.preventDefault()"
+      ></canvas>
+
+      <!-- SCENE LOADER -->
+      <div id="scene-loader" class="scene-loader">
+        <div class="loading-spinner" role="status"></div>
+        <div id="info-span" class="info-span">Loading...</div>
+      </div>
+
+      <!-- TIMEOUT OVERLAY -->
+      <div id="timeout-overlay" class="timeout-overlay">
+        <div class="inactive-message">
+          <h2>Are you still there?</h2>
+          <button onclick="TimeoutOverlay.stayConnected()">Yes</button>
+        </div>
+        <div class="disconnected-message">
+          <h2>You were disconnected.</h2>
+          <button onclick="window.location.reload()">Reconnect</button>
+        </div>
+      </div>
+
+      <div class="main-ui-layout">
+        <div class="top-row">
+          <!-- CAR HEADING CONTAINER -->
+          <div id="car-heading" class="car-heading"></div>
+          <!-- CAR HEADING TEMPLATE -->
+          <script id="car-heading-template" type="text/x-handlebars">
+            <h2 class="car-name">
+              <span>
+                <span class="highlighted-word">{{firstWord}}</span>
+                <span>{{afterFirstWord}}</span>
+              </span>
+              <div
+                class="switch-car-button"
+                onclick="UI.CarSelection.nextCar()"
+              >
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 27 47"
+                  fill="none"
+                >
+                  <path d="M2 2L23 23.5L2 45" />
+                </svg>
+              </div>
+
+              <div
+              class="switch-car-button"
+              onclick="UI.RimSelection.nextRim()"
+              >
+              <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 27 47"
+                fill="none"
+                >
+                <path d="M2 2L23 23.5L2 45" />
+              </svg>
+            </div>
+            </h2>
+          </script>
+
+          <!-- RIM HEADING CONTAINER -->
+          <div id="rim-heading" class="rim-heading"></div>
+          <!-- RIM HEADING TEMPLATE -->
+          <script id="rim-heading-template" type="text/x-handlebars">
+            <h2 class="rim-name">
+              <span>
+                <span class="highlighted-word">{{firstWord}}</span>
+                <span>{{afterFirstWord}}</span>
+              </span>
+              <div
+                class="switch-rim-button"
+                onclick="UI.RimSelection.nextRim()"
+              >
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 27 47"
+                  fill="none"
+                >
+                  <path d="M2 2L23 23.5L2 45" />
+                </svg>
+              </div>
+            </h2>
+          </script>
+
+          <div class="ui-right">
+            <!-- SETTINGS PANEL -->
+            <div class="material-and-color">
+              <!-- COLORS SELECTION CONTAINER -->
+              <div id="colors-selection" class="colors-selection"></div>
+              <!-- COLOR SELECTION TEMPLATE -->
+              <script id="colors-selection-template" type="text/x-handlebars">
+                {{#each colors as | color |}}
+                  <div
+                    style="
+                      --color: {{color.cssColor}};
+                      {{#if color.useDarkAccent}}
+                        --border-color: var(--dark-gray);
+                        --check-brightness: 0;
+                      {{/if}}
+                    "
+                    onclick="UI.CarPaint.changeSelectedColor(
+                      '{{color.cssColor}}'
+                    )"
+                    class="color {{#if color.isActive}} active-color {{/if}}"
+                  >
+                  <img
+                    src="./img/white-check.png"
+                    class="check-icon"
+                    alt=""
+                  />
+                </div>
+                {{/each}}
+              </script>
+
+              <!-- MATERIALS SELECTION -->
+              <div id="materials-selection" class="material-selection">
+                <div
+                  class="material-icon"
+                  onclick="UI.CarPaint.changeSelectedMaterial(0)"
+                >
+                  <svg
+                    width="50%"
+                    height="50%"
+                    viewBox="0 0 130 130"
+                    fill="none"
+                  >
+                    <circle
+                      cx="65"
+                      cy="65"
+                      r="57.5"
+                      class="stroke"
+                      stroke-width="15"
+                    />
+                  </svg>
+                </div>
+                <div
+                  class="material-icon"
+                  onclick="UI.CarPaint.changeSelectedMaterial(1)"
+                >
+                  <svg
+                    width="50%"
+                    height="50%"
+                    viewBox="0 0 130 130"
+                    fill="none"
+                  >
+                    <circle
+                      cx="65"
+                      cy="65"
+                      r="57.5"
+                      class="stroke"
+                      stroke-width="15"
+                    />
+                    <path
+                      d="M65 130C82.2391 130 98.7721 123.152 110.962 110.962C123.152 98.7721 130 82.2391 130 65C130 47.7609 123.152 31.2279 110.962 19.0381C98.7721 6.8482 82.2391 5.15332e-07 65 -2.84124e-06L65 65L65 130Z"
+                      class="fill"
+                    />
+                  </svg>
+                </div>
+                <div
+                  class="material-icon"
+                  onclick="UI.CarPaint.changeSelectedMaterial(2)"
+                >
+                  <svg
+                    width="50%"
+                    height="50%"
+                    viewBox="0 0 130 130"
+                    fill="none"
+                  >
+                    <circle
+                      cx="65"
+                      cy="65"
+                      r="61"
+                      class="stroke"
+                      stroke-width="8"
+                    />
+                    <circle
+                      cx="65"
+                      cy="65"
+                      r="65"
+                      transform="rotate(90 65 65)"
+                      class="fill"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lower-content">
+          <div class="bottom-bar">
+            <!-- VIEW OPTIONS -->
+            <div class="view-options">
+              <div
+                class="option-button"
+                onclick="UI.LightsViewOption.toggleLightsOn()"
+              >
+                <svg
+                  id="light-toggle"
+                  height="60%"
+                  width="60%"
+                  viewBox="0 0 128 92"
+                  fill="none"
+                >
+                  <path
+                    d="M73 14.5C64.6728 -11.6705 29.4999 3.66658 13.4999 16.9999C-4.49999 31.9998 -3.99996 55.707 13.4999 71.9999C28 85.5 61 104.5 73 80.5C77.9498 70.6005 76.5002 25.5 73 14.5Z"
+                    class="toggle-button-fill"
+                  />
+                  <path
+                    d="M91 21H123"
+                    class="toggle-button-stroke"
+                    stroke-width="10"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M91 46H123"
+                    class="toggle-button-stroke"
+                    stroke-width="10"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M91 72H123"
+                    class="toggle-button-stroke"
+                    stroke-width="10"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </div>
+
+              <div
+                class="option-button"
+                onclick="UI.RotationViewOption.toggleRotationOn()"
+              >
+                <svg
+                  id="rotate-toggle"
+                  class="toggle-button-fill"
+                  height="55%"
+                  width="55%"
+                  viewBox="0 0 214.367 214.367"
+                >
+                  <path
+                    d="M202.403,95.22c0,46.312-33.237,85.002-77.109,93.484v25.663l-69.76-40l69.76-40v23.494
+            c27.176-7.87,47.109-32.964,47.109-62.642c0-35.962-29.258-65.22-65.22-65.22s-65.22,29.258-65.22,65.22
+            c0,9.686,2.068,19.001,6.148,27.688l-27.154,12.754c-5.968-12.707-8.994-26.313-8.994-40.441C11.964,42.716,54.68,0,107.184,0
+            S202.403,42.716,202.403,95.22z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-3dverse">
+            <!-- SHARE PROMPT -->
+            <div id="share-prompt" class="share-prompt"></div>
+            <!-- SHARE PROMPT TEMPLATE -->
+            <script id="share-prompt-template" type="text/x-handlebars">
+              <h3 class="title">Share the link to join on another device</h3>
+              <button
+                class="copy-link"
+                onclick="navigator.clipboard.writeText('{{url}}')"
+              ></button>
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <!-- SDK 3dverse -->
+    <script src="https://cdn.3dverse.com/legacy/sdk/latest/SDK3DVerse.js"></script>
+    <script src="https://cdn.3dverse.com/legacy/sdk/latest/SDK3DVerse_ClientDisplay_Ext.js"></script>
+
+    <!-- HANDLERBARS (templating) -->
+    <script src="./js/vendor/handlebars.js"></script>
+
+    <!-- APP ENTRYPOINT -->
+    <script src="./js/initApp.js" type="module"></script>
+  </body>
+</html>
